@@ -5,9 +5,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.vladmikh.projects.exchange_rates.adapters.CurrencyAdapter;
 import com.vladmikh.projects.exchange_rates.data.Currency;
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView = null;
     private CurrencyAdapter currencyAdapter = null;
 
+    ArrayList<Currency> currencies;
+
     private SharedPreferences sharedPreferences;
 
     public static final String SHARED_PREFERENCES_NAME = "shared_preferences";
@@ -35,12 +39,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         currencyAdapter = new CurrencyAdapter();
 
+        currencies = getCurrencies();
+        currencyAdapter.setCurrencies(currencies);
+        recyclerView.setAdapter(currencyAdapter);
+    }
+
+    private ArrayList<Currency> getCurrencies() {
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         String currencyPreference = sharedPreferences.getString(CURRENCY_PREFERENCE, EMPTY);
         JSONObject result = null;
         if (currencyPreference.equals(EMPTY)) {
@@ -54,12 +64,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        ArrayList<Currency> currencies = JSONUtils.getCurrenciesFromJSON(result);
-        StringBuilder builder = new StringBuilder();
-        for (Currency i : currencies) {
-            builder.append(i.getName()).append("\n");
-         }
-        currencyAdapter.setCurrencies(currencies);
-        recyclerView.setAdapter(currencyAdapter);
+        return JSONUtils.getCurrenciesFromJSON(result);
+    }
+
+    public void onClickReload(View view) {
+        JSONObject jsonObject = NetworkUtils.getJSONFromNetwork();
+        sharedPreferences.edit().putString(CURRENCY_PREFERENCE, jsonObject.toString()).apply();
+        currencies =JSONUtils.getCurrenciesFromJSON(jsonObject);
+
+    }
+
+    public void onClickCalculate(View view) {
+        Intent intent = new Intent(this, CalculatorActivity.class);
+        startActivity(intent);
     }
 }

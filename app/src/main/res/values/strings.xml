@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">exchange-rates</string>
+    <string name="text_calculate">Калькулятор валют</string>
+    <string name="text_reload">Перезагрузить данные</string>
+    <string name="text_calc_currency">Калькулятор валют</string>
+    <string name="edit_text_hint">Введите сумму в рублях</string>
+    <string name="text_select_currency">Выберите валюту</string>
+    <string name="button_text_calc">Рассчитать</string>
+    <string name="text_result_label">Результат:</string>
 </resources>
