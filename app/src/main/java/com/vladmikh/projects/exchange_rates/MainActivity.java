@@ -32,13 +32,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         currencyAdapter = new CurrencyAdapter();
         JSONObject result = NetworkUtils.getJSONFromNetwork();
-        Log.i("abc", result.toString());
         ArrayList<Currency> currencies = JSONUtils.getCurrenciesFromJSON(result);
         StringBuilder builder = new StringBuilder();
         for (Currency i : currencies) {
             builder.append(i.getName()).append("\n");
          }
-        Log.i("abc", builder.toString());
         currencyAdapter.setCurrencies(currencies);
         recyclerView.setAdapter(currencyAdapter);
     }
