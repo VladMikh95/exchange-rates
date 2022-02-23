@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -27,9 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView = null;
     private CurrencyAdapter currencyAdapter = null;
 
-    ArrayList<Currency> currencies;
+    private ArrayList<Currency> currencies;
 
     private SharedPreferences sharedPreferences;
+
+    private static final long DELAY_MILLIS = 600000; //Время через которое обновляются данные в миллисекундах;
 
     public static final String SHARED_PREFERENCES_NAME = "shared_preferences";
     public static final String CURRENCY_PREFERENCE = "currencies";
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         currencies = getCurrencies();
         currencyAdapter.setCurrencies(currencies);
         recyclerView.setAdapter(currencyAdapter);
+        autoReloading();
     }
 
     private ArrayList<Currency> getCurrencies() {
@@ -65,6 +69,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return JSONUtils.getCurrenciesFromJSON(result);
+    }
+
+    private void autoReloading() {
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            int  i = 0; //переменная используется для того чтобы пропустить обновление данных сразу при запуске приложения
+            @Override
+            public void run() {
+                if (i > 0) {
+                    reload();
+                }
+                handler.postDelayed(this, DELAY_MILLIS);
+                i++;
+            }
+        });
+    }
+    private void reload() {
+        JSONObject jsonObject = NetworkUtils.getJSONFromNetwork();
+        sharedPreferences.edit().putString(CURRENCY_PREFERENCE, jsonObject.toString()).apply();
+        currencies =JSONUtils.getCurrenciesFromJSON(jsonObject);
     }
 
     public void onClickReload(View view) {
