@@ -47,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         currencyAdapter = new CurrencyAdapter();
 
+        currencies = new ArrayList<>();
+        currencies.add(new Currency("1",1,"1","name", 32,31));
+        currencies.add(new Currency("1",1,"1","name", 33,31));
+        currencies.add(new Currency("1",1,"1","name", 34,31));
+
         currencies = getCurrencies();
         currencyAdapter.setCurrencies(currencies);
         recyclerView.setAdapter(currencyAdapter);
@@ -89,12 +94,11 @@ public class MainActivity extends AppCompatActivity {
         JSONObject jsonObject = NetworkUtils.getJSONFromNetwork();
         sharedPreferences.edit().putString(CURRENCY_PREFERENCE, jsonObject.toString()).apply();
         currencies =JSONUtils.getCurrenciesFromJSON(jsonObject);
+        currencyAdapter.setCurrencies(currencies);
     }
 
     public void onClickReload(View view) {
-        JSONObject jsonObject = NetworkUtils.getJSONFromNetwork();
-        sharedPreferences.edit().putString(CURRENCY_PREFERENCE, jsonObject.toString()).apply();
-        currencies =JSONUtils.getCurrenciesFromJSON(jsonObject);
+        reload();
 
     }
 
